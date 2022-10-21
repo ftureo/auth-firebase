@@ -1,6 +1,6 @@
 import { useState } from "react";
 import firebaseApp from "../firebase/firebase";
-import { getFirestore, doc } from "firebase/firestore";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 import {
     getAuth,
     createUserWithEmailAndPassword,
@@ -13,11 +13,46 @@ const Login = () => {
     const firestore = getFirestore(firebaseApp);
     const auth = getAuth(firebaseApp);
 
+    const registerUser = async (email, password, role) => {
+        // console.log("registerUser", email, password, role);
+        const result = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+        ).then((userCredential) => {
+            // console.log("userCredential", userCredential);
+            return userCredential;
+        });
+        // console.log("result", result);
+        // console.log("result.user.uid", result.user.uid);
+        const userRef = doc(firestore, `users/${result.user.uid}`);
+        // console.log("userRef", userRef);
+        // setDoc(userRef, {email: email, role: role})
+        setDoc(userRef, { email, role });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // console.log("Submit");
+        const email = e.target.email.value;
+        const password = e.target.password.value;
+        const role = e.target.role.value;
+        // console.log("email, password, role", email, password, role);
+
+        if (isRegistered) {
+            // Register
+            registerUser(email, password, role);
+        } else {
+            // Login
+            signInWithEmailAndPassword(auth, email, password);
+        }
+    };
+
     return (
         <div>
             <h1>Login Page</h1>
             <h2>{isRegistered ? "Registrate" : "Iniciá sesión"}</h2>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <label>
                     Email:
                     <input type="text" placeholder="Email" id="email" />

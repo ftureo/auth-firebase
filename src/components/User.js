@@ -1,7 +1,11 @@
-const User = () => {
+const User = ({ user }) => {
     return (
         <div>
-            <h1>User</h1>
+            <div>
+                <h1>The User Page</h1>
+                <h2>Only for Users</h2>
+                <p>User identified as {user.email}</p>
+            </div>
         </div>
     );
 };
